@@ -20,25 +20,11 @@ public:
     void stop();
     void input(const uint8_t* data, size_t len);
     void onNewTcpConnection(const std::string& remote_ip, uint16_t remote_port);
-
-
+    ssize_t write(const uint8_t* data, size_t len);
+    ssize_t read(void* buffer, size_t size);
+    void poll();
     bool isTunDeviceOpen() const {
         return tunDevice_ != nullptr && tunDevice_->fd() >= 0;
-    }
-
-   ssize_t write(const uint8_t* data, size_t len) {
-        if (!tunDevice_) return -1;
-        return tunDevice_->write(data, len);
-    }
-    ssize_t read(void* buffer, size_t size) {
-        if (!tunDevice_) return -1;
-        return tunDevice_->read(buffer, size);
-    }
-
-
-    void poll() {
-        // 这里可以添加轮询逻辑，处理 lwIP 事件
-        // 例如调用 netif_poll() 或其他相关函数
     }
     int getTunFd() const { return tunDevice_ ? tunDevice_->fd() : -1; }
 

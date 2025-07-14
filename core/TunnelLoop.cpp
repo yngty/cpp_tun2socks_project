@@ -5,9 +5,9 @@
 #include "TunnelLoop.h"
 
 TunnelLoop::TunnelLoop(const std::string& tun_name, const std::string& socks5_addr, uint16_t socks5_port)
-    : tun_name_(tun_name), socks5_addr_(socks5_addr), socks5_port_(socks5_port), running_(true)
+    : lwip_stack_(new LwipStack),
+    tun_name_(tun_name), socks5_addr_(socks5_addr), socks5_port_(socks5_port), running_(true)
 {
-    lwip_stack_ = std::make_unique<LwipStack>();
     lwip_stack_->init(tun_name_, socks5_addr_, socks5_port_);
 }
 

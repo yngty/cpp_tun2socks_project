@@ -48,7 +48,7 @@ void LwipStack::init(const std::string& tun_name, const std::string& socks5_addr
 
     // 2. 打开 TUN 设备
     if (!tunDevice_) {
-        tunDevice_ = std::make_unique<TunDevice>(tun_name);
+        tunDevice_ = std::unique_ptr<TunDevice>(new TunDevice(tun_name));
         tunDevice_->open();
     }
 
@@ -100,11 +100,24 @@ void LwipStack::stop() {
     }
 }
 
+ssize_t LwipStack::write(const uint8_t* data, size_t len) {
+    if (!tunDevice_ || !isTunDeviceOpen()) {
+        std::cerr << "TUN device is not open." << std::endl;
+        return -1;
+    }
+    return tunDevice_->write(data, len);
+}
+
+ssize_t LwipStack::read(void* buffer, size_t size) {
+    if (!tunDevice_ || !isTunDeviceOpen()) {
+        std::cerr << "TUN device is not open." << std::endl;
+        return -1;
+    }
+    return tunDevice_->read(buffer, size);
+}
+
 void LwipStack::poll() {
-    // 这里可以添加轮询逻辑，处理 lwIP 事件
-    // 例如调用 netif_poll() 或其他相关函数
-    // lwIP 的定时器和事件处理通常在主循环中调用
-    // sys_check_timeouts();
+
 }
 void LwipStack::onNewTcpConnection(const std::string& remote_ip, uint16_t remote_port) {
     auto conn = std::make_shared<Connection>(remote_ip, remote_port, socks5_host_, socks5_port_);
