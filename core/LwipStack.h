@@ -30,8 +30,9 @@ public:
 
 private:
     std::unique_ptr<TunDevice> tunDevice_;
-    struct netif netif_; // lwIP 网络接口
-    std::vector<std::shared_ptr<Connection>> connections_; // 管理所有 TCP  连接
+    struct netif netif_;
+    struct tcp_pcb* tcp_;
+    std::vector<std::shared_ptr<Connection>> connections_;
     std::string socks5_host_;
     int socks5_port_;
 };

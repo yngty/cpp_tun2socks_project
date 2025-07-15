@@ -1,5 +1,6 @@
 #include "Connection.h"
 #include <iostream>
+// #include <boost/asio.hpp>
 
 Connection::Connection(const std::string& remote_ip, uint16_t remote_port, const std::string& socks5_host, uint16_t socks5_port)
     : remote_ip_(remote_ip), remote_port_(remote_port), socks5_host_(socks5_host), socks5_port_(socks5_port) {
@@ -17,6 +18,8 @@ void Connection::start() {
     // boost::asio::ip::tcp::socket socket(io_context);
     // boost::asio::ip::tcp::resolver resolver(io_context);
     // auto endpoints = resolver.resolve(remote_ip_, std::to_string(remote_port_));
+
+
 }
 
 void Connection::stop() {

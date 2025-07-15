@@ -16,11 +16,16 @@ TunnelLoop::~TunnelLoop() {
 }
 
 void TunnelLoop::run() {
+    lwip_stack_->start();
+
     constexpr size_t buf_size = 4096;
     std::vector<uint8_t> buffer(buf_size);
 
-    int tun_fd = lwip_stack_->getTunFd(); // 你需要在 LwipStack 提供 getTunFd() 方法
-
+    int tun_fd = lwip_stack_->getTunFd();
+    if (tun_fd < 0) {
+        std::cerr << "Failed to get TUN device file descriptor." << std::endl;
+        return;
+    }
     while (running_) {
         fd_set readfds;
         FD_ZERO(&readfds);
@@ -38,7 +43,15 @@ void TunnelLoop::run() {
 
         if (FD_ISSET(tun_fd, &readfds)) {
             ssize_t n = lwip_stack_->read(buffer.data(), buf_size);
+            if (n < 0) {
+                std::cerr << "Error reading from TUN device: " << strerror(errno) << std::endl;
+                continue;
+            } else if (n == 0) {
+                std::cerr << "TUN device closed." << std::endl;
+                break; // TUN device closed
+            }
             if (n > 0) {
+                std::cout << "Read " << n << " bytes from TUN device." << std::endl;
                 lwip_stack_->input(buffer.data(), static_cast<size_t>(n));
             }
         }
